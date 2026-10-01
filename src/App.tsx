@@ -15,6 +15,7 @@ import { AlertsView } from './components/AlertsView';
 import { Footer } from './components/Footer';
 import { BUS_SERVICES, BUS_STOPS } from './data/transitData';
 import { BusServiceItem } from './types/transit';
+import { parseLtaService, LtaResponse } from './utils/ltaParser';
 
 export default function App() {
   // Navigation & View state
@@ -23,9 +24,10 @@ export default function App() {
   const [selectedServiceNo, setSelectedServiceNo] = useState<string>('20');
   
   // Real-time synchronization timer
-  const [countdown, setCountdown] = useState<number>(25);
+  const [countdown, setCountdown] = useState<number>(20);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [lastRefreshedAt, setLastRefreshedAt] = useState<Date>(new Date());
+  const [apiSource, setApiSource] = useState<'live' | 'fallback'>('fallback');
 
   // Dynamic services dictionary for live arrival updates
   const [servicesData, setServicesData] = useState<Record<string, BusServiceItem>>(BUS_SERVICES);
@@ -78,52 +80,63 @@ export default function App() {
     } catch {}
   }, [pinnedServices]);
 
-  // Live countdown timer loop
+  // Live countdown timer loop (20-second refresh per LTA DataMall v3 specifications)
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           triggerLiveSync();
-          return 30;
+          return 20;
         }
         return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [selectedStopCode, selectedServiceNo]);
 
-  // Sync / refresh logic: recalculates slight variances to simulate live LTA feeds
-  const triggerLiveSync = () => {
+  // Sync / refresh logic: calls /api/bus-arrival and updates servicesData
+  const triggerLiveSync = async (stopCode = selectedStopCode, serviceNo = selectedServiceNo) => {
     setIsRefreshing(true);
-    setTimeout(() => {
+    try {
+      const url = `/api/bus-arrival?BusStopCode=${encodeURIComponent(stopCode)}${
+        serviceNo && serviceNo !== 'ALL' ? `&ServiceNo=${encodeURIComponent(serviceNo)}` : ''
+      }`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data: LtaResponse = await res.json();
+        if (data && data.Services && Array.isArray(data.Services) && data.Services.length > 0) {
+          setServicesData((prev) => {
+            const next = { ...prev };
+            data.Services.forEach((raw) => {
+              next[raw.ServiceNo] = parseLtaService(raw, prev[raw.ServiceNo] || BUS_SERVICES[raw.ServiceNo]);
+            });
+            return next;
+          });
+          if (data._meta?.source === 'lta_datamall_live') {
+            setApiSource('live');
+          } else {
+            setApiSource('fallback');
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[Sync] Fetch from /api/bus-arrival failed, retaining local state:', err);
+    } finally {
       setLastRefreshedAt(new Date());
       setIsRefreshing(false);
-      // Small simulated variation
-      setServicesData((prev) => {
-        const next = { ...prev };
-        Object.keys(next).forEach((k) => {
-          const s = next[k];
-          const [b1, b2, b3] = s.arrivals;
-          // Keep realistic bounds
-          const newEta1 = Math.max(1, b1.etaMinutes);
-          next[k] = {
-            ...s,
-            arrivals: [
-              { ...b1, etaMinutes: newEta1 },
-              { ...b2, etaMinutes: Math.max(newEta1 + 5, b2.etaMinutes) },
-              { ...b3, etaMinutes: Math.max(b2.etaMinutes + 8, b3.etaMinutes) }
-            ]
-          };
-        });
-        return next;
-      });
-    }, 600);
+    }
   };
 
+  // Re-sync when stop changes
+  useEffect(() => {
+    triggerLiveSync(selectedStopCode, selectedServiceNo);
+    setCountdown(20);
+  }, [selectedStopCode]);
+
   const handleManualRefresh = () => {
-    setCountdown(30);
-    triggerLiveSync();
+    setCountdown(20);
+    triggerLiveSync(selectedStopCode, selectedServiceNo);
     showToast('Arrival estimates synchronized with LTA DataMall.');
   };
 
