@@ -1,0 +1,6 @@
+{
+  "name": "SBS Transit Pulse - NextBus Arrival Timings",
+  "description": "Real-time Singapore bus arrival timings, route progression, live fleet occupancy, and multi-service journey planner powered by LTA DataMall.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

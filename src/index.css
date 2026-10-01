@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #47004a;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #67106a;
+  --color-on-primary-container: #e282dd;
+  --color-primary-fixed: #ffd6f7;
+  --color-secondary: #a83900;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #fc6018;
+  --color-secondary-fixed: #ffdbcf;
+  --color-secondary-fixed-dim: #ffb59a;
+  
+  --color-transit-purple-deep: #500C52;
+  --color-transit-purple-base: #67106A;
+  --color-transit-purple-light: #F3E8F3;
+  --color-transit-orange-base: #E65100;
+  --color-transit-orange-vivid: #EA580C;
+  --color-transit-orange-tint: #FFF4ED;
+
+  --color-crowd-seats-green: #16A34A;
+  --color-crowd-seats-bg: #ECFDF5;
+  --color-crowd-standing-amber: #D97706;
+  --color-crowd-standing-bg: #FFFBEB;
+  --color-crowd-limited-red: #DC2626;
+  --color-crowd-limited-bg: #FEF2F2;
+
+  --color-accessibility-wab-blue: #0284C7;
+  --color-accessibility-wab-bg: #E0F2FE;
+  --color-bus-double-deck: #4338CA;
+
+  --color-surface-canvas: #F8FAFC;
+  --color-surface-card: #FFFFFF;
+  --color-surface-card-subtle: #F1F5F9;
+  --color-surface: #fbf8ff;
+  --color-surface-dim: #dbd8e4;
+  --color-surface-bright: #fbf8ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f5f2fd;
+  --color-surface-container: #efecf8;
+  --color-surface-container-high: #e9e7f2;
+  --color-surface-container-highest: #e4e1ec;
+  --color-on-surface: #1b1b23;
+  --color-on-surface-variant: #50434e;
+  --color-outline: #82727e;
+  --color-outline-variant: #d4c1cf;
+
+  --font-caption-sm: "Plus Jakarta Sans", sans-serif;
+  --font-label-badge: "Space Grotesk", sans-serif;
+  --font-eta-large: "Space Grotesk", sans-serif;
+  --font-headline-lg: "Plus Jakarta Sans", sans-serif;
+  --font-headline-md: "Plus Jakarta Sans", sans-serif;
+  --font-service-number-lg: "Space Grotesk", sans-serif;
+  --font-body-lg: "Plus Jakarta Sans", sans-serif;
+  --font-body-md: "Plus Jakarta Sans", sans-serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Space Grotesk", monospace;
+}
+
+body {
+  font-family: var(--font-body-md);
+  color: var(--color-on-surface);
+  background-color: var(--color-surface-canvas);
+}
+
+.font-space-grotesk {
+  font-family: "Space Grotesk", monospace, sans-serif;
+}
+
+.font-jakarta {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+/* Material Symbols sizing helper */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  line-height: 1;
+  display: inline-block;
+}
+
+.material-symbols-outlined.fill-1 {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4c1cf;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #82727e;
+}
